@@ -1,3 +1,4 @@
+<h4>Please follow given instrcutions to install dependencies and to ensure no errors comes when running app:</h4>
 <ol>
     <li>
         Navigate to 'player' folder and run <code>pip install -r requirements.txt</code>

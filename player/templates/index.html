@@ -1,0 +1,214 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="shortcut icon" href="{% static '/logo.png' %}">
+    <meta charset="UTF-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="msapplication-starturl" content="/">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta property='og:image' content='{% static "/logo.png" %}'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="{% static 'css/song.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player</title>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+</head>
+
+<body class="bg-dark text-light">
+    <form onsubmit="go(event)" enctype="multipart/form-data"> {%csrf_token%}<div class="search-song shadow"> <img
+                src="{% static '/logo.png' %}" width="30px"> <input id="query" onfocus="downPlayer()"
+                onfocusout="upPlayer()" autocomplete="off" class="search-i" name="query" type="text"
+                placeholder="Search a song..."> <button type="submit" class="btn btn-dark search-b"><i
+                    class="fa fa-search"></i></button>
+        </div>
+        <div class="suggestions">
+            <ul class="list-group rounded" id="sug_">
+
+            </ul>
+        </div>
+    </form>
+    {% for message in messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert"> <strong>{{message}}</strong> <button
+            type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+    {% endfor %}
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <span class="nav-link"><button type="button" class="btn btn-dark" disabled>Hello,
+                            <b>{{user.username}}</b></button></span>
+                </li>
+                <li class="nav-item" id="lib">
+                    <span class="nav-link"><button type="button" class="btn btn-dark">Your Library</button></span>
+                </li>
+                <li class="nav-item">
+                    <a href="logout/" class="nav-link"><button type="button" class="btn btn-dark"
+                            id="logout">Logout</button></a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" target="_blank" href="login/"><button type="button" class="btn btn-dark"
+                            id="login">Login</button></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="register/" target="_blank"><button type="button" class="btn btn-dark"
+                            id="register">Register</button></a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <p class="display-5" id="info"></p>
+    </div>
+    <div class="container">
+        <div id="data" class="row">
+            {% for o in objs%}
+            <div class="col">
+                <div class="m-card"
+                    style="background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9) 90%), url('{{o.thumb}}');">
+                    <!-- <div class="for-click" role="button" onclick="play_aud('{{o.sid}}', this)"></div> -->
+                    <div class="for-click" role="button" onclick="play_aud('{{o.sid}}', this)"
+                        onmouseover="$($(this).children()[0]).fadeIn(200)"
+                        onmouseleave="$($(this).children()[0]).fadeOut(200)">
+                        <span class="fa fa-play"></span>
+                    </div>
+                    <div class="m-card-info">
+                        <p class="m-card-info-title">
+                            {{o.title}}
+                        </p>
+                        <span class="m-card-info-text">{{o.dur}}</span>
+                        <div class="m-card-buttons">
+                            <button class="rounded-circle btn" onclick="play_aud('{{o.sid}}', this)">
+                                <span class="fa fa-play"></span>
+                            </button>
+                            <button class="rounded-circle btn" onclick="addSong('{{o.sid}}', '{{o.title}}',this)">
+                                <span class="fa fa-plus"></span>
+                            </button>
+                            {% if user.is_authenticated %}
+                            {% if o.sid in liked %}
+                            <button class="rounded-circle btn" onclick="like('{{o.sid}}', this)">
+                                <span class="fa fa-heart"></span>
+                            </button>
+                            {% else %}
+                            <button class="rounded-circle btn" onclick="like('{{o.sid}}', this)">
+                                <span class="fa fa-heart-o"></span>
+                            </button>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <p class="mt-3" style="text-align: center;font-size: 20px;">Developed by Het!❤</p>
+            {% if user.is_authenticated != True %}
+            <p style="text-align: center;font-size: 10px;">Register and log in to like your favourite songs and
+                playlist!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-dark text-light rounded p-2 status"><span></span></div>
+    <div class="player">
+        <div class="c-range">
+            <input class="range" value="0" type="range" id="aud_range" min="0"></input>
+        </div>
+        <div class="player-bar">
+            <div class="s-info">
+                <img class="s-img" src="{% static '/logo.png' %}">
+                <div>
+                    <b><span class="s-title"></span></b>
+                </div>
+            </div>
+            <div class="song-controls">
+                <div class="c-btns btn btn-group">
+                    <button class="btn btn-dark" id="prev_song">
+                        <i class="fa fa-backward"></i>
+                    </button>
+                    <button id="pause_play" class="btn btn-dark">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="btn btn-dark" id="next_song">
+                        <i class="fa fa-forward"></i>
+                    </button>
+                </div>
+                <div class="btn btn-group">
+                    <button class="btn btn-dark" href="#s-data" id="showQ">
+                        <i class='fa fa-ellipsis-v'></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="s-data" id="s-data">
+        <div class="shadow s-data-main text-light p-3">
+            <div style="display: flex;justify-content: flex-end; align-items: center; margin-top: 50px; width: 100%;"
+                class="pb-3">
+                <button class="btn btn-dark" id="close_q">
+                    <i class="fa fa-close"></i>
+                </button>
+            </div>
+            <div class="btn btn-group">
+                <a href="#" target="_blank" id="dlink" download>
+                    <button class="btn btn-dark">
+                        <i class='fa fa-download'></i> Download Song
+                    </button>
+                </a>
+            </div>
+            <!-- <div class="btn btn-group">
+                <button class="btn btn-dark chatFeatureButton">
+                    <i class='fa fa-moon-o'></i> <span id="timer_update">Sleep Timer</span>
+                </button>
+            </div>
+            <div class="chatHeaderFreatureButtonFunc bg-dark text-light">
+                <span class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark"
+                    onclick="setSleepTimer(300)">5 minutes</span><br>
+                <span class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark"
+                    onclick="setSleepTimer(600)">10 minutes</span><br>
+                <span class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark"
+                    onclick="setSleepTimer(900)">15 minutes</span><br>
+                <span class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark"
+                    onclick="setSleepTimer(1800)">30 minutes</span><br>
+                <span class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark"
+                    onclick="setSleepTimer(2700)">45 minutes</span><br>
+                <span class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark"
+                    onclick="setSleepTimer(3600)">1 hour</span><br>
+                <span class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark"
+                    onclick="setSleepTimer(0)">End of Track</span><br>
+                <span
+                    class="chatHeaderFreatureButtonFuncOption p-2 btn font-weight-bold btn-dark close-dropdown fa fa-close"></span>
+            </div> -->
+            <div class="space-btwn">
+                <p class="display-5">Your Queue</p>
+                <div class="btn btn-group">
+                    <button class="btn btn-dark" id="clear_q">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                    <button class="btn btn-dark" id="rand_q">
+                        <i class="fa fa-random"></i>
+                    </button>
+                </div>
+            </div>
+            <br><br>
+            <div class="s-data-queue">
+                <ul>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="for_menu"></div>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    <script src="{% static 'js/search.js' %}"></script>
+    <script src="{% static 'js/playlist.js' %}"></script>
+</body>
+
+</html>

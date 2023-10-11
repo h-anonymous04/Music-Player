@@ -1,0 +1,6 @@
+django
+pytube
+youtube-search-python
+yt_dlp
+youtube-dl
+pafy

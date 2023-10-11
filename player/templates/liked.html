@@ -1,0 +1,65 @@
+{% if user.is_authenticated %}
+{% if videos|length != 0 %}
+{% for key, value in videos.items %}
+{% if value.type == "playlist" %}
+<div class="col">
+    <div class="m-card" style='background-image: linear-gradient(
+                  180deg,
+                  rgba(0, 0, 0, 0.1),
+                  rgba(0, 0, 0, 0.9) 90%
+                ),
+                url("{{value.thumb}}");
+              '>
+        <div class="for-click" role="button" onclick="viewPlaylist('{{key}}', this)"
+            onmouseover="$($(this).children()[0]).fadeIn(200)" onmouseleave="$($(this).children()[0]).fadeOut(200)">
+            <span class="fa fa-eye"></span>
+        </div>
+        <div class="m-card-info">
+            <p class="m-card-info-title">{{value.title}}</p>
+            <div class="m-card-buttons">
+                <button class="rounded-circle btn">
+                    <span class="fa fa-play"></span>
+                </button>
+                <button class="rounded-circle btn" onclick="addPlaylist('{{key}}',this)">
+                    <span class="fa fa-plus"></span>
+                </button>
+                <button class="rounded-circle btn" onclick="like('{{key}}', this)">
+                    <span class="fa fa-heart"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+<div class="col">
+    <div class="m-card"
+        style="background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9) 90%), url('{{value.thumb}}');">
+        <div class="for-click" role="button" onclick="play_aud('{{key}}', this)"
+            onmouseover="$($(this).children()[0]).fadeIn(200)" onmouseleave="$($(this).children()[0]).fadeOut(200)">
+            <span class="fa fa-play"></span>
+        </div>
+        <div class="m-card-info">
+            <p class="m-card-info-title">{{value.title}}</p>
+            <span class="m-card-info-text">{{value.duration}}</span>
+            <div class="m-card-buttons">
+                <button class="rounded-circle btn" onclick="play_aud('{{key}}', this)">
+                    <span class="fa fa-play"></span>
+                </button>
+                <button class="rounded-circle btn" onclick="addSong('{{key}}', '{{value.title}}',this)">
+                    <span class="fa fa-plus"></span>
+                </button>
+                <button class="rounded-circle btn" onclick="like('{{key}}', this)">
+                    <span class="fa fa-heart"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% else %}
+<p>Your liked list is empty...</p>
+{% endif %}
+{% endif %}

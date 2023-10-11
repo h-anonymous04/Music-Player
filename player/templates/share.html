@@ -1,0 +1,142 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" href="{% static '/logo.png' %}">
+    <meta charset="UTF-8">
+    <meta property='og:image' content='{% static "/logo.png" %}'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="{% static 'css/song.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{song_title}}</title>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+</head>
+
+<body class="bg-dark text-light"> <audio style="display: none;" src="{{song_url}}" class="aud" id="aud"></audio>
+    <form onsubmit="go(event)" enctype="multipart/form-data"> {%csrf_token%}<div class="search-song shadow"> <img
+                src="{% static '/logo.png' %}" width="30px"> <input id="query" onfocus="downPlayer()"
+                onfocusout="upPlayer()" autocomplete="off" class="search-i" name="query" type="text"
+                placeholder="Search a song..."> <button type="submit" class="btn bg-dark text-light search-b"><i
+                    class="fa fa-search"></i></button></div>
+        <div class="suggestions">
+            <ul class="list-group rounded">
+
+            </ul>
+        </div>
+    </form> {% for message in messages %}<div class="p-3">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert"> <strong>{{message}}</strong> <button
+                type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>
+    </div> {% endfor %}
+    <nav class="navbar navbar-expand navbar-dark bg-dark">
+        <div class="container-fluid">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <span class="nav-link">Hello, <b>{{user.username}}</b></span>
+                </li>
+                <li class="nav-item">
+                    <a href="logout/"><button type="button" class="btn btn-dark" id="logout">Logout</button></a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="login/"><button type="button" class="btn btn-dark"
+                            id="login">Login</button></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="register/"><button type="button" class="btn btn-dark"
+                            id="register">Register</button></a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <div class="bg-img">
+        <div class="container mt-5">
+            <p class="display-5"></p>
+        </div>
+        <div id="data" class="container" style="width: 100%">
+
+        </div>
+        <div class="bg-dark text-light rounded p-2 status"> <span></span></div>
+        <div class="player">
+            <div class="song-p-title">
+                <h6 style="margin:0; padding:0;" class="text-center text-light">{{song_title}}</h6>
+            </div>
+            <div class="song-controls">
+                <div class="c-btns btn btn-group">
+                    <button class="btn btn-dark" id="prev_song">
+                        <i class="fa fa-backward"></i>
+                    </button>
+                    <button id="pause_play" class="btn btn-dark">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="btn btn-dark" id="next_song">
+                        <i class="fa fa-forward"></i>
+                    </button>
+                </div>
+                <div class="btn btn-group">
+                    <button class="btn btn-dark" id="showQ">
+                        <i class='fa fa-reorder'></i>
+                    </button>
+                </div>
+                <div class="c-range">
+                    <div class="p-bar">
+                        <div class="p-main-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="s-data">
+        <div class="shadow s-data-main text-light p-3">
+            <div style="display: flex;justify-content: flex-end; align-items: center; margin-top: 50px; width: 100%;" class="pb-3">
+                <button class="btn btn-dark" id="close_q">
+                    <i class="fa fa-close"></i>
+                </button>
+            </div>
+            <div class="card mb-3" style="background: transparent">
+                <div class="row g-0" style="display: flex;justify-content: space-evenly;align-items: center;">
+                  <div class="col">
+                    <img src="{{song_thumb}}" class="s-data-crr-img img-fluid rounded-start">
+                  </div>
+                  <div class="col">
+                    <div class="card-body">
+                      <h6 class="card-title s-data-crr-title">{{song_title}}</h6>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <button class="btn btn-dark" style="float: right;" data-id="{{song_id}}" id="share">
+                        <i class='fa fa-share'></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            <div class="space-btwn">
+                <p class="display-5">Your Queue</p>
+                <div class="btn btn-group">
+                    <button class="btn btn-dark" id="clear_q">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                    <button class="btn btn-dark" id="rand_q">
+                        <i class="fa fa-random"></i>
+                    </button>
+                </div>
+            </div>
+            <br><br>
+            <div class="s-data-queue">
+                <ul>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="for_menu"></div>
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+    <script src="{% static 'js/search.js' %}"></script>
+    <script src="{% static 'js/playlist.js' %}"></script>
+</body>
+</html>

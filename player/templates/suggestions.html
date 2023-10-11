@@ -1,0 +1,5 @@
+<li class="text-light bg-dark list-group-item" style="float: right;" onclick="closeS()"><i class="fa fa-close"></i>tap
+    here to close</li>
+{% for s in su %}
+<li class="list-group-item text-light bg-dark " onclick="updateVal(this)">{{s}}</li>
+{% endfor %}

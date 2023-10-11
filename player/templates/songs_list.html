@@ -1,0 +1,70 @@
+{% if videos|length == 0 %}
+<h5>No songs found!</h5>
+{% else %} {% for video in videos %} {% if video.3 == "playlist" %}
+<div class="col">
+  <div class="m-card" style='background-image: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.9) 90%
+      ),
+      url("{{video.2}}");
+    '>
+    <div class="for-click" role="button" onclick="viewPlaylist('{{video.0}}', this)"
+      onmouseover="$($(this).children()[0]).fadeIn(200)" onmouseleave="$($(this).children()[0]).fadeOut(200)">
+      <span class="fa fa-eye"></span>
+    </div>
+    <div class="m-card-info">
+      <p class="m-card-info-title">{{video.1}}</p>
+      <div class="m-card-buttons">
+        <button class="rounded-circle btn" onclick="viewPlaylist('{{video.0}}',this)">
+          <span class="fa fa-eye"></span>
+        </button>
+        <button class="rounded-circle btn" onclick="addPlaylist('{{video.0}}',this)">
+          <span class="fa fa-plus"></span>
+        </button>
+        {% if user.is_authenticated %} {% if video.0 in liked %}
+        <button class="rounded-circle btn" onclick="like('{{video.0}}', this)">
+          <span class="fa fa-heart"></span>
+        </button>
+        {% else %}
+        <button class="rounded-circle btn" onclick="like('{{video.0}}', this)">
+          <span class="fa fa-heart-0"></span>
+        </button>
+        {% endif %} {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %} {% if video.3 == "video" %}
+<div class="col">
+  <div class="m-card"
+    style="background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9) 90%), url('{{video.2.url}}');">
+    <div class="for-click" role="button" onclick="play_aud('{{video.0}}', this)"
+      onmouseover="$($(this).children()[0]).fadeIn(200)" onmouseleave="$($(this).children()[0]).fadeOut(200)">
+      <span class="fa fa-play"></span>
+    </div>
+    <div class="m-card-info">
+      <p class="m-card-info-title">{{video.1}}</p>
+      <span class="m-card-info-text">{{video.4}}</span>
+      <div class="m-card-buttons">
+        <button class="rounded-circle btn" onclick="play_aud('{{video.0}}', this)">
+          <span class="fa fa-play"></span>
+        </button>
+        <button class="rounded-circle btn" onclick="addSong('{{video.0}}', '{{video.1}}',this)">
+          <span class="fa fa-plus"></span>
+        </button>
+        {% if user.is_authenticated %} {% if video.0 in liked %}
+        <button class="rounded-circle btn" onclick="like('{{video.0}}', this)">
+          <span class="fa fa-heart"></span>
+        </button>
+        {% else %}
+        <button class="rounded-circle btn" onclick="like('{{video.0}}', this)">
+          <span class="fa fa-heart-o"></span>
+        </button>
+        {% endif %} {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<br />
+{% endif %} {% endfor %} {% endif %}
